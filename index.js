@@ -18,6 +18,7 @@ var http_status_codes_1 = __importDefault(require("http-status-codes"));
 var camelCase = function (str) { return str.toLowerCase().replace(/(\_\w)/g, function (c) { return c[1].toUpperCase(); }); };
 var errorHandler = function (error, request, response, next) {
     var _a;
+    var _b, _c;
     /* default */
     var responseObject = {
         code: 500,
@@ -28,8 +29,8 @@ var errorHandler = function (error, request, response, next) {
     };
     // if(error == {}) return response.send(responseObject.code).json(responseObject)
     var mapObjectMethods = {};
-    for (var _i = 0, _b = Object.entries(http_status_codes_1.default); _i < _b.length; _i++) {
-        var _c = _b[_i], httpStatus = _c[0], httpCode = _c[1];
+    for (var _i = 0, _d = Object.entries(http_status_codes_1.default); _i < _d.length; _i++) {
+        var _e = _d[_i], httpStatus = _e[0], httpCode = _e[1];
         if (!httpStatus.startsWith('get') && typeof httpCode !== 'function' && !['1', '2'].includes(String(httpCode).charAt(0))) {
             Object.assign(mapObjectMethods, (_a = {}, _a[httpCode] = camelCase(httpStatus), _a));
         }
@@ -83,18 +84,13 @@ var errorHandler = function (error, request, response, next) {
     }
     if (statusText)
         responseObject.message = statusText;
-    // if(error?.code) responseObject.code = error.code
-    // if(error?.status) responseObject.status = error.status
-    // if(error?.message) responseObject.message = error.message
-    // if(error?.errors) responseObject.errors = error.errors
-    // if(error?.success) responseObject.success = error.success
     // @ts-ignore
-    // if(automaticMethod?.status && typeof response[`send_${automaticMethod.status}`] === 'function') {
-    //   // @ts-ignore
-    //   return response[`send_${automaticMethod}`](
-    //     error?.message ?? statusText, error?.content
-    //   )
-    // }
+    if ((automaticMethod === null || automaticMethod === void 0 ? void 0 : automaticMethod.status) && typeof response["send_".concat(automaticMethod.status)] === 'function') {
+        // @ts-ignore
+        console.log('REALLYYYYY!!!', response["send_".concat(automaticMethod)]((_b = error === null || error === void 0 ? void 0 : error.message) !== null && _b !== void 0 ? _b : statusText, error === null || error === void 0 ? void 0 : error.content));
+        // @ts-ignore
+        return response["send_".concat(automaticMethod)]((_c = error === null || error === void 0 ? void 0 : error.message) !== null && _c !== void 0 ? _c : statusText, error === null || error === void 0 ? void 0 : error.content);
+    }
     return response.status(responseObject.code).json(__assign(__assign({}, responseObject), error));
 };
 exports.default = errorHandler;

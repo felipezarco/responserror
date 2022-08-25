@@ -87,7 +87,7 @@ const errorHandler = (error: any, request: Request, response: Response, next: Ne
   // if(automaticMethod?.status && typeof response[`send_${automaticMethod.status}`] === 'function') {
   //   // @ts-ignore
   //   return response[`send_${automaticMethod}`](
-  //     error?.message ?? statusText, error?.content
+  //     error?.message ?? statusText, error?.errors ?? error?.content
   //   )
   // }
   

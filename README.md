@@ -87,7 +87,7 @@ app.use(router, errorHandler)
 
 - **message**: will be filled automatically if given `code` or `status` are valid and no `message` value is given.
 
-- **content**: anything can be sent here, responserror will not try to fill this. This will be displayed as `errors`.
+- **errors**: anything can be sent here, responserror will not try to fill this.
 
 Note: if `message` is given a value, that will **override** the automatic value responserror would give. This applies to all other properties. 
 
@@ -124,7 +124,7 @@ app.use(router, errorHandler)
 
 The same would be the output for `{ status: 'GATEWAY_TIMEOUT' }` or `{ code: 504, status: 'GATEWAY_TIMEOUT' }`.
 
-### In this example, we send send `message` and `content` properties:
+### In this example, we send send `message` and `errors` properties:
 
 ````typescript
 
@@ -136,7 +136,7 @@ router.post('/users', (_, response: Response, next: NextFunction) => {
     throw {
       code: 400,
       message: 'Sorry!! Your request is invalid! =/',
-      content: [
+      errors: [
         { name: 'clientFullName', message: 'The full name needs to contain more than one word!' }
       ]
     }
