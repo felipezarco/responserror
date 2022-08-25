@@ -122,7 +122,7 @@ app.use(router, errorHandler)
 }
 ````
 
-The same would be the output for `{ status: 'BAD_REQUEST' }` or `{ code: 400, status: 'BAD_REQUEST' }`.
+The same would be the output for `{ status: 'GATEWAY_TIMEOUT' }` or `{ code: 504, status: 'GATEWAY_TIMEOUT' }`.
 
 ### In this example, we send send `message` and `content` properties:
 
