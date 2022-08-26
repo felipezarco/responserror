@@ -6,9 +6,11 @@ Responserror is an Error Handler middleware for [express](https://expressjs.com)
 
 https://expressjs.com/en/guide/error-handling.html
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT) [![npm version](https://badge.fury.io/js/responserror.svg)](https://badge.fury.io/js/felipezarco%2Fresponserror) [![Build Status](https://travis-ci.org/felipezarco/responserror.svg?branch=master)](https://travis-ci.org/felipezarco/responserror) [![Coverage Status](https://coveralls.io/repos/github/felipezarco/responserror/badge.svg?branch=master)](https://coveralls.io/github/felipezarco/responserror?branch=master) ![Downloads](https://img.shields.io/npm/dw/responserror)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT) [![npm version](https://badge.fury.io/js/responserror.svg)](https://badge.fury.io/js/felipezarco%2Fresponserror)  [![Coverage Status](https://coveralls.io/repos/github/felipezarco/responserror/badge.svg?branch=master)](https://coveralls.io/github/felipezarco/responserror?branch=master) ![Downloads](https://img.shields.io/npm/dw/responserror)
 
 [![npm](https://nodei.co/npm/responserror.png)](https://www.npmjs.com/package/responserror)
+
+[![CircleCI](https://dl.circleci.com/status-badge/img/gh/felipezarco/responserror/tree/main.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/felipezarco/responserror/tree/main)
 
 ## Installation
 

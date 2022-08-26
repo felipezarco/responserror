@@ -1,17 +1,17 @@
 
-import errorHandler from './index'
 import express, { Response, NextFunction } from 'express'
 import responser from 'responser'
 
 import request from 'supertest'
+import Responserror from './index'
 
 test('it throws default response', async () => {
   
   const app = express()
   
-  app.use(responser)
-  
   const router = express.Router()
+  
+  const errorHandler = new Responserror({ promptErrors: true }).errorHandler
   
   router.post('/planets', (_, response: Response, next: NextFunction) => {
     try {
@@ -38,9 +38,9 @@ test('it sends error response for given code', async () => {
   
   const app = express()
   
-  app.use(responser)
-  
   const router = express.Router()
+  
+  const { errorHandler } = new Responserror({ promptErrors: true })
   
   router.post('/planets', (_, response: Response, next: NextFunction) => {
     try {
@@ -69,9 +69,9 @@ test('it sends error response for given status', async () => {
   
   const app = express()
   
-  app.use(responser)
-  
   const router = express.Router()
+  
+  const { errorHandler } = new Responserror({ promptErrors: true })
   
   router.post('/planets', (_, response: Response, next: NextFunction) => {
     try {
@@ -104,6 +104,8 @@ test('it sends error response for given code', async () => {
   app.use(responser)
   
   const router = express.Router()
+  
+  const { errorHandler } = new Responserror({ promptErrors: true })
   
   router.post('/planets', (_, response: Response, next: NextFunction) => {
     try {
