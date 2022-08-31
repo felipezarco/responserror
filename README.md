@@ -1,10 +1,8 @@
 # Responserror
 
-> Express Error Handler para Node.js 
+> Express Error Handler to Node.js apps
 
-Responserror is an Error Handler middleware for [express](https://expressjs.com).
-
-https://expressjs.com/en/guide/error-handling.html
+Responserror is an [Error Handler middleware](https://expressjs.com/en/guide/error-handling.html) for express.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT) [![npm version](https://badge.fury.io/js/responserror.svg)](https://badge.fury.io/js/felipezarco%2Fresponserror)  [![Coverage Status](https://coveralls.io/repos/github/felipezarco/responserror/badge.svg?branch=master)](https://coveralls.io/github/felipezarco/responserror?branch=master) ![Downloads](https://img.shields.io/npm/dw/responserror)
 
@@ -22,19 +20,14 @@ Use your favorite package manager to install. For instance:
   yarn add responserror
 ```
 
-Then import it:
+Then import it and initialize a new instance:
 
-```javascript
-import errorHandler from 'responserror'
+```typescript
+import Responserror from 'responserror'
+const { errorHandler } = new Responserror()
 ```
 
-Or, for commonjs:
-
-```javascript
-const errorHandler = require('responserror')
-```
-
-**Then, you will want to add responserror as your last express middleware**:
+**Then, you will want to add the `errorHandler` as your last express middleware**:
 
 ```javascript
 app.use(authRouter, userRouter, errorHandler)
@@ -42,69 +35,19 @@ app.use(authRouter, userRouter, errorHandler)
 
 And you're good to go!
 
-## Usage
+## Usage Example 
 
 ```typescript
+import express from 'express'
+import Responserror from 'responserror'
 
 const app = express()
-const errorHandler = require('responserror')
-app.use(responser)
+const router = express.Router()
+
+const { errorHandler } = new Responserror()
 
 router.post('/users', (_, response: Response, next: NextFunction) => {
   try {
-    /* Do something interesting like creating a user.. */
-    /* And if something bad happens: */
-    throw {}
-  } catch(err) {
-    return next(err)
-  }
-})
-
-app.use(router, errorHandler) 
-
-/* Outputs: */
-{
-  code: 500,
-  status: 'INTERNAL_SERVER_ERROR',
-  message: 'Internal Server Error',
-  success: false
-}
-````
-
-## You can throw an error object
-
-````typescript
-  {
-    code: 400,
-    status: 'BAD_REQUEST',
-    message: 'The request was malformed please checkout our documentation!'
-  }
-````
-
-- **code**: if given `responserror` will try to find its `status` and `message` automatically.
-
-- **status**: if given `responserror` will try to find its `code` and `message` automatically.
-
-- **success**: will always be `false`, unless explicitly specified.
-
-- **message**: will be filled automatically if given `code` or `status` are valid and no `message` value is given.
-
-- **errors**: anything can be sent here, responserror will not try to fill this.
-
-Note: if `message` is given a value, that will **override** the automatic value responserror would give. This applies to all other properties. 
-
-All properties are optional as shown in the first example.
-
-### In this example, we send only the property `code`
-
-````typescript
-
-const app = express()
-app.use(responser)
-
-router.post('/users', (_, response: Response, next: NextFunction) => {
-  try {
-    /* error object example */
     throw {
       code: 504,
     }
@@ -122,17 +65,25 @@ app.use(router, errorHandler)
   message: 'Gateway Timeout',
   success: false
 }
-````
+```
 
-The same would be the output for `{ status: 'GATEWAY_TIMEOUT' }` or `{ code: 504, status: 'GATEWAY_TIMEOUT' }`.
+- **code**: if given `responserror` will try to find its `status` and `message` automatically.
+
+- **status**: if given `responserror` will try to find its `code` and `message` automatically.
+
+- **success**: will always be `false`, unless explicitly specified.
+
+- **message**: will be filled automatically if given `code` or `status` are valid and no `message` value is given.
+
+- **errors**: anything can be sent here, responserror will not try to fill this.
+
+Note: if `message` is given a value, that will **override** the automatic value responserror would give. This applies to all other properties. 
+
+All properties are optional as shown in the first example.
 
 ### In this example, we send send `message` and `errors` properties:
 
 ````typescript
-
-const app = express()
-app.use(responser)
-
 router.post('/users', (_, response: Response, next: NextFunction) => {
   try {
     throw {
@@ -146,8 +97,6 @@ router.post('/users', (_, response: Response, next: NextFunction) => {
     return next(err)
   }
 })
-
-app.use(router, errorHandler)
 
 /* Outputs: */
 {
