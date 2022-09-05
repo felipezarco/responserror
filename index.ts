@@ -18,6 +18,14 @@ type IResponserrorObject = {
 
 class Responserror {
   
+  private preFunctions: Array<Function> = []
+  
+  private posFunctions: Array<Function> = []
+
+  public pre = (fn: Function) => this.preFunctions.push(fn)
+  
+  public pos = (fn: Function) => this.posFunctions.push(fn)
+  
   private options: IOptions
   
   private mapStatusByCode: { [code: number]: string } = {}
@@ -33,22 +41,23 @@ class Responserror {
   private setMapStatusByCode = () => {
     for(const [httpStatus, httpCode] of Object.entries(HttpStatus)) {
       if(!httpStatus.startsWith('get') && typeof httpCode !== 'function' && !['1','2'].includes(String(httpCode).charAt(0))) {
-        Object.assign(this.mapStatusByCode, { [httpCode]: camelCase(httpStatus) })
+        Object.assign(this.mapStatusByCode, { [httpCode]: httpStatus })
       }
     }
   }
   
   private setDefaultValuesForResponserror = () => {
-    if(!this.responserror.code && !this.responserror.status && !this.responserror.message) {
+    // @ts-ignore
+    if(!['code','status','message'].some((prop) => this.responserror[prop])) {
       this.responserror.code = 500
-      this.responserror.status = 'INTERNAL_SERVER_ERROR',
-      this.responserror.message = 'Internal Server Error',
+      this.responserror.status = 'INTERNAL_SERVER_ERROR'
+      this.responserror.message = 'Internal Server Error'
     }
-    if(!this.responserror.success) this.responserror.success = false,
+    if(!this.responserror.success) this.responserror.success = false
     if(!this.responserror.errors) this.responserror.errors = undefined
   }
   
-  public getStatusTextByCode = function(code: string | number) {
+  public getMessageByCode = function(code: string | number) {
     try { 
       return HttpStatus.getStatusText(code)
     } catch(e) {
@@ -68,36 +77,57 @@ class Responserror {
     }
   }
   
-  constructor(options: IOptions) {
+  constructor(options: IOptions = { promptErrors: false }) {
     this.options = options
     this.setMapStatusByCode()
   }
   
   errorHandler = (error: any, request: Request, response: Response, next: NextFunction) => {
     
-    if(this.options.promptErrors === true || (typeof this.options.promptErrors === 'function' && this.options.promptErrors())) {
-      
+    this.preFunctions.forEach((fn) => fn.apply(null))
+    
+    if(error.status) {
+      this.responserror.status = error.status
+      const code = this.getCodeByStatus(error.status)
+      if(code) this.responserror.code = code
     }
     
-    const statusText: string | undefined = this.getStatusTextByCode(this.responserror.code)
-    
-    this.responserror.message = error.message 
-    
-    // @ts-ignore
-    if(automaticMethod?.status && typeof response[`send_${automaticMethod.status}`] === 'function') {
-      // @ts-ignore
-      return response[`send_${automaticMethod}`](
-        error?.message ?? statusText, error?.errors ?? error?.content
-      )
+    if(error.code) {
+      this.responserror.code = error.code
+      const status = this.getStatusByCode(error.code)
+      if(status) this.responserror.status = status
     }
+    
+    this.responserror.message = error.message ?? this.getMessageByCode(this.responserror.code)
+    this.responserror.errors = error.errors ?? error.content
+
+    const responserLikeStatus = camelCase(this.responserror.status)
     
     this.setDefaultValuesForResponserror()
-     
-    return response.status(this.responserror.code).json({ ...this.responserror, ...error })
+    
+    const responserrorObject = { ...this.responserror, ...error }
+    
+    if(this.options.promptErrors === true || (typeof this.options.promptErrors === 'function' && this.options.promptErrors())) {
+      // To be implemented
+      console.warn('[Responserror]', responserrorObject)
+    }
+    
+    this.posFunctions.forEach((fn) => fn.apply(null))
+    
+    delete error.code
+    delete error.status
+    delete error.message
+    delete error.success
+    delete error.errors
+    
+    // @ts-ignore
+    if(typeof response[`send_${responserLikeStatus}`] === 'function') {
+      // @ts-ignore
+      return response[`send_${responserLikeStatus}`](this.responserror.message, error)
+    }
+      
+    return response.status(this.responserror.code).json(responserrorObject)
   }
-  
-  
-  
 }
 
 export default Responserror

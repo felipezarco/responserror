@@ -1,17 +1,17 @@
 
-import errorHandler from './index'
 import express, { Response, NextFunction } from 'express'
 import responser from 'responser'
 
 import request from 'supertest'
+import Responserror from './index'
 
 test('it throws default response', async () => {
   
   const app = express()
   
-  app.use(responser)
-  
   const router = express.Router()
+  
+  const errorHandler = new Responserror().errorHandler
   
   router.post('/planets', (_, response: Response, next: NextFunction) => {
     try {
@@ -38,9 +38,9 @@ test('it sends error response for given code', async () => {
   
   const app = express()
   
-  app.use(responser)
-  
   const router = express.Router()
+  
+  const { errorHandler } = new Responserror()
   
   router.post('/planets', (_, response: Response, next: NextFunction) => {
     try {
@@ -69,9 +69,9 @@ test('it sends error response for given status', async () => {
   
   const app = express()
   
-  app.use(responser)
-  
   const router = express.Router()
+  
+  const { errorHandler } = new Responserror()
   
   router.post('/planets', (_, response: Response, next: NextFunction) => {
     try {
@@ -104,6 +104,46 @@ test('it sends error response for given code', async () => {
   app.use(responser)
   
   const router = express.Router()
+  
+  const { errorHandler } = new Responserror()
+  
+  router.post('/planets', (_, response: Response, next: NextFunction) => {
+    try {
+      throw {
+        code: 504
+      }
+    } catch(err) {
+      return next(err)
+    }
+  })
+   
+  /* @ts-ignore */
+  app.use(router, errorHandler)
+  
+  const response = await request(app).post('/planets')
+  
+  expect(response.body).toEqual({
+    code: 504,
+    status: 'GATEWAY_TIMEOUT',
+    message: 'Gateway Timeout',
+    success: false
+  })
+})
+
+test('it executes pre and pos function', async () => {
+  
+  const app = express()
+  
+  app.use(responser)
+  
+  const router = express.Router()
+  
+  const responserror = new Responserror({ promptErrors: true })
+  
+  const errorHandler = responserror.errorHandler
+  
+  responserror.pre(() => console.info('pre'))
+  responserror.pos(() => console.info('pos'))
   
   router.post('/planets', (_, response: Response, next: NextFunction) => {
     try {
