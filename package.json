@@ -1,6 +1,6 @@
 {
   "name": "responserror",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Error Handler Middlware for Express",
   "main": "index.js",
   "types": "index",
@@ -39,7 +39,8 @@
   },
   "homepage": "https://github.com/felipezarco/responserror#readme",
   "dependencies": {
-    "http-status-codes": "^2.1.4"
+    "http-status-codes": "^2.1.4",
+    "throwlhos": "^0.0.5"
   },
   "devDependencies": {
     "@types/express": "^4.17.11",

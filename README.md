@@ -1,14 +1,14 @@
 # Responserror
 
-> Express Error Handler para Node.js 
+> Express Error Handler to Node.js apps
 
-Responserror is an Error Handler middleware for [express](https://expressjs.com).
+Responserror is an [Error Handler middleware](https://expressjs.com/en/guide/error-handling.html) for express.
 
-https://expressjs.com/en/guide/error-handling.html
-
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT) [![npm version](https://badge.fury.io/js/responserror.svg)](https://badge.fury.io/js/felipezarco%2Fresponserror) [![Build Status](https://travis-ci.org/felipezarco/responserror.svg?branch=master)](https://travis-ci.org/felipezarco/responserror) [![Coverage Status](https://coveralls.io/repos/github/felipezarco/responserror/badge.svg?branch=master)](https://coveralls.io/github/felipezarco/responserror?branch=master) ![Downloads](https://img.shields.io/npm/dw/responserror)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT) [![npm version](https://badge.fury.io/js/responserror.svg)](https://badge.fury.io/js/felipezarco%2Fresponserror)  [![Coverage Status](https://coveralls.io/repos/github/felipezarco/responserror/badge.svg?branch=master)](https://coveralls.io/github/felipezarco/responserror?branch=master) ![Downloads](https://img.shields.io/npm/dw/responserror)
 
 [![npm](https://nodei.co/npm/responserror.png)](https://www.npmjs.com/package/responserror)
+
+[![CircleCI](https://dl.circleci.com/status-badge/img/gh/felipezarco/responserror/tree/main.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/felipezarco/responserror/tree/main)
 
 ## Installation
 
@@ -20,19 +20,14 @@ Use your favorite package manager to install. For instance:
   yarn add responserror
 ```
 
-Then import it:
+Then import it and initialize a new instance:
 
-```javascript
-import errorHandler from 'responserror'
+```typescript
+import Responserror from 'responserror'
+const { errorHandler } = new Responserror()
 ```
 
-Or, for commonjs:
-
-```javascript
-const errorHandler = require('responserror')
-```
-
-**Then, you will want to add responserror as your last express middleware**:
+**Then, you will want to add the `errorHandler` as your last express middleware**:
 
 ```javascript
 app.use(authRouter, userRouter, errorHandler)
@@ -40,69 +35,19 @@ app.use(authRouter, userRouter, errorHandler)
 
 And you're good to go!
 
-## Usage
+## Usage Example 
 
 ```typescript
+import express from 'express'
+import Responserror from 'responserror'
 
 const app = express()
-const errorHandler = require('responserror')
-app.use(responser)
+const router = express.Router()
+
+const { errorHandler } = new Responserror()
 
 router.post('/users', (_, response: Response, next: NextFunction) => {
   try {
-    /* Do something interesting like creating a user.. */
-    /* And if something bad happens: */
-    throw {}
-  } catch(err) {
-    return next(err)
-  }
-})
-
-app.use(router, errorHandler) 
-
-/* Outputs: */
-{
-  code: 500,
-  status: 'INTERNAL_SERVER_ERROR',
-  message: 'Internal Server Error',
-  success: false
-}
-````
-
-## You can throw an error object
-
-````typescript
-  {
-    code: 400,
-    status: 'BAD_REQUEST',
-    message: 'The request was malformed please checkout our documentation!'
-  }
-````
-
-- **code**: if given `responserror` will try to find its `status` and `message` automatically.
-
-- **status**: if given `responserror` will try to find its `code` and `message` automatically.
-
-- **success**: will always be `false`, unless explicitly specified.
-
-- **message**: will be filled automatically if given `code` or `status` are valid and no `message` value is given.
-
-- **errors**: anything can be sent here, responserror will not try to fill this.
-
-Note: if `message` is given a value, that will **override** the automatic value responserror would give. This applies to all other properties. 
-
-All properties are optional as shown in the first example.
-
-### In this example, we send only the property `code`
-
-````typescript
-
-const app = express()
-app.use(responser)
-
-router.post('/users', (_, response: Response, next: NextFunction) => {
-  try {
-    /* error object example */
     throw {
       code: 504,
     }
@@ -112,25 +57,34 @@ router.post('/users', (_, response: Response, next: NextFunction) => {
 })
 
 app.use(router, errorHandler)
-
-/* Outputs: */
+```
+Outputs HTTP Status 504 and following JSON response:
+```typescript
 {
   code: 504,
   status: 'GATEWAY_TIMEOUT',
   message: 'Gateway Timeout',
   success: false
 }
-````
+```
 
-The same would be the output for `{ status: 'GATEWAY_TIMEOUT' }` or `{ code: 504, status: 'GATEWAY_TIMEOUT' }`.
+- **code**: if given **`responserror`** will try to find its `status` and `message` automatically.
 
-### In this example, we send send `message` and `errors` properties:
+- **status**: if given **`responserror`** will try to find its `code` and `message` automatically.
 
-````typescript
+- **success**: will always be `false`, unless specified otherwise.
 
-const app = express()
-app.use(responser)
+- **message**: will be filled automatically if given `code` or `status` are valid and no `message` value is given.
 
+- **errors**: anything can be sent here, **`responserror`** will not try to fill this.
+
+Note: if `message` is given a value, that will **override** the automatic value **`responserror`** would give. This applies to all other properties. 
+
+All properties are optional as shown in the first example.
+
+### In this example, we send `message` and `errors` as well:
+
+```typescript
 router.post('/users', (_, response: Response, next: NextFunction) => {
   try {
     throw {
@@ -144,10 +98,9 @@ router.post('/users', (_, response: Response, next: NextFunction) => {
     return next(err)
   }
 })
-
-app.use(router, errorHandler)
-
-/* Outputs: */
+```
+Outputs HTTP Status 400 and following JSON response:
+```typescript
 {
   code: 400,
   status: 'BAD_REQUEST',
@@ -156,7 +109,32 @@ app.use(router, errorHandler)
     { name: 'clientFullName', message: 'The full name needs to contain more than one word!' }
   ]
 }
-````
+```
+
+## Hooks 
+
+Use method `pre` to execute functions before sending the response:
+
+```typescript
+
+const app = express()
+
+app.use(responser)
+
+const responserror = new Responserror({ promptErrors: true })
+
+const errorHandler = responserror.errorHandler
+
+responserror.pre(() => {
+  console.info('This will execute before the error response is given!')
+})
+
+const router = express.Router()
+
+app.use(router, errorHandler)
+
+```
+While `pre` will execute as the first thing **`responserror`** will do, method `pos` will execute as the last thing responserror will do before sending the response.
    
 ## Status & Codes
 
@@ -217,15 +195,15 @@ app.use(router, errorHandler)
 507 // Insufficient Storage
 511 // Network Authentication Required
 ```
-Check the [updated list of http status codes](https://github.com/prettymuchbryce/http-status-codes#codes) for all status and code accepted by `responserror`.
+Check the [updated list of http status codes](https://github.com/prettymuchbryce/http-status-codes#codes) for all status and codes available.
 
 ## Responser
 
-If you want to have all HTTP responses at the tip of your finger (including sucessful ones), be sure to check out [responser](https://www.npmjs.com/package/responser) npm package. Differently from `responserror` which is the "catch-all" error handler for express, `responser` is used to directly send responses, wherever middleware/controller you are. Both can be used together.
+If you want to have all HTTP responses at the tip of your finger (including sucessful ones), be sure to check out [responser](https://www.npmjs.com/package/responser) npm package. Differently from **`responserror`** which is the "catch-all" error handler for express, `responser` is used to directly send responses, wherever middleware/controller you are. Both `responser` and **`responserror`** can be used together.
 
 ![vscode suggestions](https://raw.githubusercontent.com/felipezarco/files/master/images/screenshots/responser.png "Responser typescript methods suggestion")
 
-If you are using [responser](https://www.npmjs.com/package/responser) module in the same express instance, `responserror` will invoke send_* methods instead of its own.
+If you are using [responser](https://www.npmjs.com/package/responser) module in the same express instance, **`responserror`** will invoke send_* methods instead of its own.
 
 ## Testing
 

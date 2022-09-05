@@ -1,0 +1,20 @@
+version: '2.1'
+orbs: 
+  node: circleci/node@5.0.2
+jobs:
+  build_and_test:
+    executor: node/default
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: yarn
+      - run: 
+          command: yarn tsc
+          name: Compiling Source Code
+      - run: 
+          command: yarn test
+          name: Running Automated Tests
+workflows:
+  automated_build_and_test:
+    jobs:
+      - build_and_test
