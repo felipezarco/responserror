@@ -18,13 +18,13 @@ type IResponserrorObject = {
 
 class Responserror {
   
-  private static preFunctions: Array<Function> = []
+  private preFunctions: Array<Function> = []
   
-  private static posFunctions: Array<Function> = []
+  private posFunctions: Array<Function> = []
+
+  public pre = (fn: Function) => this.preFunctions.push(fn)
   
-  static pre = (fn: Function) => this.preFunctions.push(fn)
-  
-  static pos = (fn: Function) => this.posFunctions.push(fn)
+  public pos = (fn: Function) => this.posFunctions.push(fn)
   
   private options: IOptions
   
@@ -77,14 +77,14 @@ class Responserror {
     }
   }
   
-  constructor(options: IOptions) {
+  constructor(options: IOptions = { promptErrors: false }) {
     this.options = options
     this.setMapStatusByCode()
   }
   
   errorHandler = (error: any, request: Request, response: Response, next: NextFunction) => {
     
-    Responserror.preFunctions.forEach((fn) => fn.apply(null))
+    this.preFunctions.forEach((fn) => fn.apply(null))
     
     if(error.status) {
       this.responserror.status = error.status
@@ -103,28 +103,30 @@ class Responserror {
 
     const responserLikeStatus = camelCase(this.responserror.status)
     
-    /* Behavior when responser is available */
-    // @ts-ignore
-    if(typeof response[`send_${responserLikeStatus}`] === 'function') {
-      // @ts-ignore
-      return response[`send_${responserLikeStatus}`](this.responserror.message)
-    }
-    
     this.setDefaultValuesForResponserror()
+    
+    const responserrorObject = { ...this.responserror, ...error }
     
     if(this.options.promptErrors === true || (typeof this.options.promptErrors === 'function' && this.options.promptErrors())) {
       // To be implemented
+      console.warn('[Responserror]', responserrorObject)
     }
     
-    Responserror.posFunctions.forEach((fn) => fn.apply(null))
+    this.posFunctions.forEach((fn) => fn.apply(null))
     
     delete error.code
     delete error.status
     delete error.message
     delete error.success
     delete error.errors
+    
+    // @ts-ignore
+    if(typeof response[`send_${responserLikeStatus}`] === 'function') {
+      // @ts-ignore
+      return response[`send_${responserLikeStatus}`](this.responserror.message, error)
+    }
       
-    return response.status(this.responserror.code).json({ ...this.responserror, ...error })
+    return response.status(this.responserror.code).json(responserrorObject)
   }
 }
 

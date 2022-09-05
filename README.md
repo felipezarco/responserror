@@ -57,8 +57,9 @@ router.post('/users', (_, response: Response, next: NextFunction) => {
 })
 
 app.use(router, errorHandler)
-
-/* Outputs: */
+```
+Outputs HTTP Status 504 and following JSON response:
+```typescript
 {
   code: 504,
   status: 'GATEWAY_TIMEOUT',
@@ -67,23 +68,23 @@ app.use(router, errorHandler)
 }
 ```
 
-- **code**: if given `responserror` will try to find its `status` and `message` automatically.
+- **code**: if given **`responserror`** will try to find its `status` and `message` automatically.
 
-- **status**: if given `responserror` will try to find its `code` and `message` automatically.
+- **status**: if given **`responserror`** will try to find its `code` and `message` automatically.
 
-- **success**: will always be `false`, unless explicitly specified.
+- **success**: will always be `false`, unless specified otherwise.
 
 - **message**: will be filled automatically if given `code` or `status` are valid and no `message` value is given.
 
-- **errors**: anything can be sent here, responserror will not try to fill this.
+- **errors**: anything can be sent here, **`responserror`** will not try to fill this.
 
-Note: if `message` is given a value, that will **override** the automatic value responserror would give. This applies to all other properties. 
+Note: if `message` is given a value, that will **override** the automatic value **`responserror`** would give. This applies to all other properties. 
 
 All properties are optional as shown in the first example.
 
-### In this example, we send send `message` and `errors` properties:
+### In this example, we send `message` and `errors` as well:
 
-````typescript
+```typescript
 router.post('/users', (_, response: Response, next: NextFunction) => {
   try {
     throw {
@@ -97,8 +98,9 @@ router.post('/users', (_, response: Response, next: NextFunction) => {
     return next(err)
   }
 })
-
-/* Outputs: */
+```
+Outputs HTTP Status 400 and following JSON response:
+```typescript
 {
   code: 400,
   status: 'BAD_REQUEST',
@@ -107,7 +109,32 @@ router.post('/users', (_, response: Response, next: NextFunction) => {
     { name: 'clientFullName', message: 'The full name needs to contain more than one word!' }
   ]
 }
-````
+```
+
+## Hooks 
+
+Use method `pre` to execute functions before sending the response:
+
+```typescript
+
+const app = express()
+
+app.use(responser)
+
+const responserror = new Responserror({ promptErrors: true })
+
+const errorHandler = responserror.errorHandler
+
+responserror.pre(() => {
+  console.info('This will execute before the error response is given!')
+})
+
+const router = express.Router()
+
+app.use(router, errorHandler)
+
+```
+While `pre` will execute as the first thing **`responserror`** will do, method `pos` will execute as the last thing responserror will do before sending the response.
    
 ## Status & Codes
 
@@ -168,15 +195,15 @@ router.post('/users', (_, response: Response, next: NextFunction) => {
 507 // Insufficient Storage
 511 // Network Authentication Required
 ```
-Check the [updated list of http status codes](https://github.com/prettymuchbryce/http-status-codes#codes) for all status and code accepted by `responserror`.
+Check the [updated list of http status codes](https://github.com/prettymuchbryce/http-status-codes#codes) for all status and codes available.
 
 ## Responser
 
-If you want to have all HTTP responses at the tip of your finger (including sucessful ones), be sure to check out [responser](https://www.npmjs.com/package/responser) npm package. Differently from `responserror` which is the "catch-all" error handler for express, `responser` is used to directly send responses, wherever middleware/controller you are. Both can be used together.
+If you want to have all HTTP responses at the tip of your finger (including sucessful ones), be sure to check out [responser](https://www.npmjs.com/package/responser) npm package. Differently from **`responserror`** which is the "catch-all" error handler for express, `responser` is used to directly send responses, wherever middleware/controller you are. Both `responser` and **`responserror`** can be used together.
 
 ![vscode suggestions](https://raw.githubusercontent.com/felipezarco/files/master/images/screenshots/responser.png "Responser typescript methods suggestion")
 
-If you are using [responser](https://www.npmjs.com/package/responser) module in the same express instance, `responserror` will invoke send_* methods instead of its own.
+If you are using [responser](https://www.npmjs.com/package/responser) module in the same express instance, **`responserror`** will invoke send_* methods instead of its own.
 
 ## Testing
 
