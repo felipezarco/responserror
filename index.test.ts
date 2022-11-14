@@ -139,7 +139,7 @@ test('it executes pre and pos function', async () => {
   
   const router = express.Router()
   
-  const responserror = new Responserror({ promptErrors: true })
+  const responserror = new Responserror()
   
   const errorHandler = responserror.errorHandler
   
@@ -237,12 +237,10 @@ test('it sends error with invalid array', async () => {
 test('it sends error with invalid array and throwlhos package', async () => {
   
   const app = express()
-  
-  app.use(responser)
-  
+
   const router = express.Router()
-  
   const { errorHandler } = new Responserror()
+  app.use(responser, router, errorHandler)
   
   const invalid = [
     {
@@ -266,9 +264,6 @@ test('it sends error with invalid array and throwlhos package', async () => {
       return next(err)
     }
   })
-   
-  /* @ts-ignore */
-  app.use(router, errorHandler)
   
   const response = await request(app).post('/planets')
   
