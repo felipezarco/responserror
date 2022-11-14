@@ -1,6 +1,6 @@
 {
   "name": "responserror",
-  "version": "0.0.2",
+  "version": "0.0.5",
   "description": "Error Handler Middlware for Express",
   "main": "index.js",
   "types": "index",
