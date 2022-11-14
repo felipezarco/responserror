@@ -98,8 +98,8 @@ class Responserror {
       if(status) this.responserror.status = status
     }
     
-    this.responserror.message = error.message ?? this.getMessageByCode(this.responserror.code)
-    this.responserror.errors = error.errors ?? error.content
+    this.responserror.message = error.message || this.getMessageByCode(this.responserror.code)
+    this.responserror.errors = error.errors || error.content
 
     const responserLikeStatus = camelCase(this.responserror.status)
     

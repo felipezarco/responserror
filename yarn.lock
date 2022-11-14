@@ -3898,10 +3898,10 @@ throat@^5.0.0:
   resolved "https://registry.yarnpkg.com/throat/-/throat-5.0.0.tgz#c5199235803aad18754a667d659b5e72ce16764b"
   integrity sha512-fcwX4mndzpLQKBS1DVYhGAcYaYt7vsHNIvQV+WXMvnow5cgjPphq5CaayLaGsjRdSCKZFNGt7/GYAuXaNOiYCA==
 
-throwlhos@^0.0.5:
-  version "0.0.5"
-  resolved "https://registry.yarnpkg.com/throwlhos/-/throwlhos-0.0.5.tgz#1f959b92742e00297b97c0c5210006a0d1b33f9e"
-  integrity sha512-egbKSHJqCigahIGrH1gMYNblKYxtA3u9Kl1UDk+VvnIgt6ypTmP5/cz2CJPpYkYUSNxN3zsE7it7HOscNKpqeQ==
+throwlhos@^0.0.6:
+  version "0.0.6"
+  resolved "https://registry.yarnpkg.com/throwlhos/-/throwlhos-0.0.6.tgz#a3fb4fe7bbb4ad651591c2fc8e34a61f72e0f9ac"
+  integrity sha512-WCEN+CzpBUMl5ufsRK+Sgo0qye+ZRWDovfr9RoCOFPybmJE2c2f9hzXwu4HWBuEz9Gym6uRWmd8SyWSnDb+DXw==
   dependencies:
     http-status-codes "^2.2.0"
 
