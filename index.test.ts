@@ -167,3 +167,69 @@ test('it executes pre and pos function', async () => {
     success: false
   })
 })
+
+
+test('it sends error with invalid array', async () => {
+  
+  const app = express()
+  
+  app.use(responser)
+  
+  const router = express.Router()
+  
+  const { errorHandler } = new Responserror()
+  
+  router.post('/planets', (_, response: Response, next: NextFunction) => {
+    try {
+      throw {
+        code: 504,
+        errors: {
+          invalid: [
+            {
+              field: "name",
+              message: "Campo obrigatório!"
+            },
+            {
+              field: "slug",
+              message: "Campo obrigatório!"
+            },
+            {
+              field: "description",
+              message: "Campo obrigatório!"
+            }
+          ]
+       }
+      }
+    } catch(err) {
+      return next(err)
+    }
+  })
+   
+  /* @ts-ignore */
+  app.use(router, errorHandler)
+  
+  const response = await request(app).post('/planets')
+  
+  expect(response.body).toEqual({
+    code: 504,
+    status: 'GATEWAY_TIMEOUT',
+    message: 'Gateway Timeout',
+    success: false,
+    errors: {
+      invalid: [
+        {
+          field: "name",
+          message: "Campo obrigatório!"
+        },
+        {
+          field: "slug",
+          message: "Campo obrigatório!"
+        },
+        {
+          field: "description",
+          message: "Campo obrigatório!"
+        }
+      ]
+    }
+  })
+})

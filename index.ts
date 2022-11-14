@@ -108,22 +108,15 @@ class Responserror {
     const responserrorObject = { ...this.responserror, ...error }
     
     if(this.options.promptErrors === true || (typeof this.options.promptErrors === 'function' && this.options.promptErrors())) {
-      // To be implemented
-      console.warn('[Responserror]', responserrorObject)
+      console.warn('responserror >>', responserrorObject)
     }
     
-    this.posFunctions.forEach((fn) => fn.apply(null))
-    
-    delete error.code
-    delete error.status
-    delete error.message
-    delete error.success
-    delete error.errors
-    
+    this.posFunctions.forEach((fn) => fn.apply(null))   
+   
     // @ts-ignore
     if(typeof response[`send_${responserLikeStatus}`] === 'function') {
       // @ts-ignore
-      return response[`send_${responserLikeStatus}`](this.responserror.message, error)
+      return response[`send_${responserLikeStatus}`](this.responserror.message, responserrorObject?.errors)
     }
       
     return response.status(this.responserror.code).json(responserrorObject)
