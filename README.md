@@ -10,11 +10,17 @@ Responserror is an [Error Handler middleware](https://expressjs.com/en/guide/err
 
 [![CircleCI](https://dl.circleci.com/status-badge/img/gh/felipezarco/responserror/tree/main.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/felipezarco/responserror/tree/main)
 
+## Why?
+
+Answer: just throw.
+
+You want to `throw` errors from anywhere in your express app, without the need to send responses on every try/catch exception. God damn, just catch my throws!
+
 ## Installation
 
 The latest version is available at: https://www.npmjs.com/package/responserror
 
-Use your favorite package manager to install. For instance: 
+Use your favorite package manager to install:
 
 ```
   yarn add responserror
@@ -27,7 +33,7 @@ import Responserror from 'responserror'
 const { errorHandler } = new Responserror()
 ```
 
-**Then, you will want to add the `errorHandler` as your last express middleware**:
+Then, you will want to add the `errorHandler` as your **LAST** express middleware:
 
 ```javascript
 app.use(authRouter, userRouter, errorHandler)
@@ -68,6 +74,8 @@ Outputs HTTP Status 504 and following JSON response:
 }
 ```
 
+## Where did that response came from?!
+
 - **code**: if given **`responserror`** will try to find its `status` and `message` automatically.
 
 - **status**: if given **`responserror`** will try to find its `code` and `message` automatically.
@@ -82,7 +90,15 @@ Note: if `message` is given a value, that will **override** the automatic value 
 
 All properties are optional as shown in the first example.
 
-### In this example, we send `message` and `errors` as well:
+All properties can be overwritten.
+
+## I want to send other stuff that is not anything like this object!
+
+Alright, that was expected... We've got you covered.
+
+`errors` can receive and return anything you desire.
+
+In this example, we send `errors` as well:
 
 ```typescript
 router.post('/users', (_, response: Response, next: NextFunction) => {
@@ -196,6 +212,16 @@ While `pre` will execute as the first thing **`responserror`** will do, method `
 511 // Network Authentication Required
 ```
 Check the [updated list of http status codes](https://github.com/prettymuchbryce/http-status-codes#codes) for all status and codes available.
+
+## Extra
+
+Responserror instance public methods other than `errorHandler` middleware:
+
+```typescript
+getMessageByCode(code: string | number)
+getStatusByCode(code: number)
+getCodeByStatus(status: string)
+```
 
 ## Responser
 
