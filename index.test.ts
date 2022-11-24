@@ -1,6 +1,7 @@
 
 import express, { Response, NextFunction } from 'express'
 import responser from 'responser'
+import throwlhos from 'throwlhos'
 
 import request from 'supertest'
 import Responserror from './index'
@@ -138,7 +139,7 @@ test('it executes pre and pos function', async () => {
   
   const router = express.Router()
   
-  const responserror = new Responserror({ promptErrors: true })
+  const responserror = new Responserror()
   
   const errorHandler = responserror.errorHandler
   
@@ -165,5 +166,127 @@ test('it executes pre and pos function', async () => {
     status: 'GATEWAY_TIMEOUT',
     message: 'Gateway Timeout',
     success: false
+  })
+})
+
+test('it sends error with invalid array', async () => {
+  
+  const app = express()
+  
+  app.use(responser)
+  
+  const router = express.Router()
+  
+  const { errorHandler } = new Responserror()
+  
+  router.post('/planets', (_, response: Response, next: NextFunction) => {
+    try {
+      throw {
+        code: 400,
+        errors: {
+          invalid: [
+            {
+              field: "name",
+              message: "Campo obrigatório!"
+            },
+            {
+              field: "slug",
+              message: "Campo obrigatório!"
+            },
+            {
+              field: "description",
+              message: "Campo obrigatório!"
+            }
+          ]
+       }
+      }
+    } catch(err) {
+      return next(err)
+    }
+  })
+   
+  /* @ts-ignore */
+  app.use(router, errorHandler)
+  
+  const response = await request(app).post('/planets')
+  
+  expect(response.body).toEqual({
+    code: 400,
+    status: 'BAD_REQUEST',
+    message: 'Bad Request',
+    success: false,
+    errors: {
+      invalid: [
+        {
+          field: "name",
+          message: "Campo obrigatório!"
+        },
+        {
+          field: "slug",
+          message: "Campo obrigatório!"
+        },
+        {
+          field: "description",
+          message: "Campo obrigatório!"
+        }
+      ]
+    }
+  })
+})
+
+test('it sends error with invalid array and throwlhos package', async () => {
+  
+  const app = express()
+
+  const router = express.Router()
+  const { errorHandler } = new Responserror()
+  app.use(responser, router, errorHandler)
+  
+  const invalid = [
+    {
+      field: "name",
+      message: "Campo obrigatório!"
+    },
+    {
+      field: "slug",
+      message: "Campo obrigatório!"
+    },
+    {
+      field: "description",
+      message: "Campo obrigatório!"
+    }
+  ]
+  
+  router.post('/planets', (_, response: Response, next: NextFunction) => {
+    try {
+      throw throwlhos.err_badRequest('Campos inválidos', { invalid })
+    } catch(err) {
+      return next(err)
+    }
+  })
+  
+  const response = await request(app).post('/planets')
+  
+  expect(response.body).toEqual({
+    code: 400,
+    status: 'BAD_REQUEST',
+    message: 'Campos inválidos',
+    success: false,
+    errors: {
+      invalid: [
+        {
+          field: "name",
+          message: "Campo obrigatório!"
+        },
+        {
+          field: "slug",
+          message: "Campo obrigatório!"
+        },
+        {
+          field: "description",
+          message: "Campo obrigatório!"
+        }
+      ]
+    }
   })
 })
