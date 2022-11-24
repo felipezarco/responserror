@@ -73,7 +73,6 @@ var Responserror = /** @class */ (function () {
             }
         };
         this.errorHandler = function (error, request, response, next) {
-            var _a, _b;
             _this.preFunctions.forEach(function (fn) { return fn.apply(null); });
             if (error.status) {
                 _this.responserror.status = error.status;
@@ -87,25 +86,19 @@ var Responserror = /** @class */ (function () {
                 if (status_1)
                     _this.responserror.status = status_1;
             }
-            _this.responserror.message = (_a = error.message) !== null && _a !== void 0 ? _a : _this.getMessageByCode(_this.responserror.code);
-            _this.responserror.errors = (_b = error.errors) !== null && _b !== void 0 ? _b : error.content;
+            _this.responserror.message = error.message || _this.getMessageByCode(_this.responserror.code);
+            _this.responserror.errors = error.errors || error.content;
             var responserLikeStatus = camelCase(_this.responserror.status);
             _this.setDefaultValuesForResponserror();
             var responserrorObject = __assign(__assign({}, _this.responserror), error);
             if (_this.options.promptErrors === true || (typeof _this.options.promptErrors === 'function' && _this.options.promptErrors())) {
-                // To be implemented
-                console.warn('[Responserror]', responserrorObject);
+                console.warn('responserror >>', responserrorObject);
             }
             _this.posFunctions.forEach(function (fn) { return fn.apply(null); });
-            delete error.code;
-            delete error.status;
-            delete error.message;
-            delete error.success;
-            delete error.errors;
             // @ts-ignore
             if (typeof response["send_".concat(responserLikeStatus)] === 'function') {
                 // @ts-ignore
-                return response["send_".concat(responserLikeStatus)](_this.responserror.message, error);
+                return response["send_".concat(responserLikeStatus)](_this.responserror.message, responserrorObject === null || responserrorObject === void 0 ? void 0 : responserrorObject.errors);
             }
             return response.status(_this.responserror.code).json(responserrorObject);
         };
